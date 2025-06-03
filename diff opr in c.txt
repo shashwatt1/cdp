@@ -1,0 +1,25 @@
+Question 2:
+Write a Lex program to validate identifiers, integers, numbers, and floating numbers in C language.
+
+Solution:
+%{
+#include <stdio.h>
+%}
+
+%%
+[a-zA-Z_][a-zA-Z0-9_]*              { printf("Valid Identifier: %s\n", yytext); }
+[0-9]+\.[0-9]+                      { printf("Valid Floating Number: %s\n", yytext); }
+[0-9]+                              { printf("Valid Integer: %s\n", yytext); }
+[ \t\n]+                            { /* skip whitespace */ }
+.                                   { printf("Invalid Token: %s\n", yytext); }
+%%
+
+int main() {
+    printf("Enter input:\n");
+    yylex();
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}

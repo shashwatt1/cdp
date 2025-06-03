@@ -1,0 +1,75 @@
+Write a Lex and Yacc program to validate a function call.
+
+Solution:
+Lex file:
+%{
+#include "y.tab.h"
+%}
+
+%%
+
+"int"               { return INT; }
+"float"             { return FLOAT; }
+"char"              { return CHAR; }
+
+[a-zA-Z_][a-zA-Z0-9_]*    { return IDENTIFIER; }
+[0-9]+                   { return NUMBER; }
+
+"("     { return LPAREN; }
+")"     { return RPAREN; }
+","     { return COMMA; }
+";"     { return SEMICOLON; }
+
+[ \t\n]+    ; // skip whitespace
+.           { return INVALID; }
+
+%%
+
+int yywrap() {
+    return 1; 
+}
+
+Yacc file:
+%{
+#include <stdio.h>
+#include <stdlib.h>
+
+int yylex();
+void yyerror(const char *s);
+%}
+
+%token INT FLOAT CHAR IDENTIFIER NUMBER LPAREN RPAREN COMMA SEMICOLON INVALID
+
+%%
+
+call_stmt:
+      IDENTIFIER LPAREN args RPAREN SEMICOLON
+    ;
+
+args:
+      /* empty */
+    | arg_list
+    ;
+
+arg_list:
+      expr
+    | expr COMMA arg_list
+    ;
+
+expr:
+      IDENTIFIER
+    | NUMBER
+    ;
+
+%%
+
+void yyerror(const char *s) {
+    fprintf(stderr, "Syntax Error: %s\n", s);
+}
+
+int main() {
+    printf("Enter a function call:\n");
+    yyparse();
+    printf("Function call is valid.\n");
+    return 0;
+}

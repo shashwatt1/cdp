@@ -1,0 +1,55 @@
+Question 7:
+Write a Lex and Yacc program to verify the validity of an integer variable declaration.
+
+Solution:
+Lex code:
+%{
+#include "y.tab.h"
+%}
+
+%%
+
+int                             { return INT; }
+[_a-zA-Z][_a-zA-Z0-9]*          { return ID; }
+,                               { return COMMA; }
+;                               { return SEMICOLON; }
+[ \t\n]+                        { /* skip whitespace */ }
+.                               { return INVALID; }
+
+%%
+
+int yywrap() {
+    return 1;
+}
+
+Yacc code:
+%{
+#include <stdio.h>
+void yyerror(const char *msg);
+int yylex(void);
+%}
+
+%token INT ID COMMA SEMICOLON INVALID
+
+%%
+
+stmt: INT decl_list SEMICOLON
+    {
+        printf("Valid integer declaration.\n");
+    }
+    ;
+
+decl_list: ID
+         | decl_list COMMA ID
+         ;
+
+%%
+
+void yyerror(const char *msg) {
+    printf("Invalid declaration.\n");
+}
+
+int main() {
+    printf("Enter an integer declaration:\n");
+    return yyparse();
+}

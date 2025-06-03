@@ -1,0 +1,34 @@
+Write a Lex program to count the number of lines, spaces, alphabets, and digits in a given input.
+
+Solution: 
+%{
+#include <stdio.h>
+
+int lines = 0;
+int spaces = 0;
+int alphabets = 0;
+int digits = 0;
+%}
+
+%%
+[a-zA-Z]      { alphabets++; }
+[0-9]         { digits++; }
+[ \t]         { spaces++; }
+\n            { lines++; }
+.             { /* Ignore other characters */ }
+%%
+
+int main() {
+    printf("Enter input :\n");
+    yylex();
+    printf("\n--- User Input Statistics ---\n");
+    printf("Lines     : %d\n", lines);
+    printf("Spaces    : %d\n", spaces);
+    printf("Alphabets : %d\n", alphabets);
+    printf("Digits    : %d\n", digits);
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}

@@ -1,0 +1,63 @@
+Question 9:
+Write a Lex and Yacc program to validate the regular expression a^n b^m (n, m ≥ 0).
+
+Solution:
+Lex file:
+%{
+#include "y.tab.h"
+%}
+
+%%
+a       { return A; }
+b       { return B; }
+\n      { return EOL; }
+.       { return INVALID; }
+
+%%
+int yywrap() {
+    return 1;
+}
+
+Yacc file:
+%{
+#include <stdio.h>
+#include <stdlib.h>
+
+int yylex(void);
+void yyerror(const char *s);
+%}
+
+%token A B EOL INVALID
+
+%%
+input:
+    string EOL       { printf("Valid a^n b^m string\n"); }
+  | INVALID EOL      { yyerror("Invalid character encountered"); }
+  ;
+
+string:
+    pre suf
+  ;
+
+pre:
+    /* empty */ 
+  | A pre
+  ;
+
+suf:
+    /* empty */
+  | B suf
+  ;
+
+%%
+
+void yyerror(const char *s) {
+    printf("Invalid a^n b^m string\n");
+    exit(1);
+}
+
+int main() {
+    printf("Enter a string of the form a^n b^m:\n");
+    yyparse();
+    return 0;
+}

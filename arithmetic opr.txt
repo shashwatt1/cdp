@@ -1,0 +1,76 @@
+Question 10:
+Write a Lex and Yacc program to perform arithmetic operations.
+
+Solution:
+Lex file:
+%{
+#include "y.tab.h"
+#include <stdlib.h>
+%}
+
+%%
+
+[0-9]+      { yylval = atoi(yytext); return NUMBER; }
+[\t ]+      { /* skip whitespace */ }
+\n          { return EOL; }
+"+"         { return PLUS; }
+"-"         { return MINUS; }
+"*"         { return MULTIPLY; }
+"/"         { return DIVIDE; }
+"("         { return LPAREN; }
+")"         { return RPAREN; }
+.           { return INVALID; }
+
+%%
+
+int yywrap() {
+    return 1;
+}
+Yacc file:
+%{
+#include <stdio.h>
+#include <stdlib.h>
+
+int yylex();
+void yyerror(const char *s);
+%}
+
+%token NUMBER PLUS MINUS MULTIPLY DIVIDE LPAREN RPAREN EOL INVALID
+
+%left PLUS MINUS
+%left MULTIPLY DIVIDE
+%left LPAREN RPAREN
+
+%%
+
+input:
+      /* empty */
+    | input expr EOL     { printf("Result = %d\n", $2); }
+    ;
+
+expr:
+      expr PLUS expr     { $$ = $1 + $3; }
+    | expr MINUS expr    { $$ = $1 - $3; }
+    | expr MULTIPLY expr { $$ = $1 * $3; }
+    | expr DIVIDE expr   { 
+                            if ($3 == 0) {
+                                yyerror("Division by zero");
+                                YYABORT;
+                            }
+                            $$ = $1 / $3; 
+                          }
+    | LPAREN expr RPAREN { $$ = $2; }
+    | NUMBER             { $$ = $1; }
+    ;
+
+%%
+
+void yyerror(const char *s) {
+    fprintf(stderr, "Error: %s\n", s);
+}
+
+int main() {
+    printf("Enter arithmetic expressions (e.g., 3 + 4 * 2):\n");
+    yyparse();
+    return 0;
+}

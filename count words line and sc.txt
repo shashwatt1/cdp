@@ -1,0 +1,35 @@
+Question 4:
+Write a Lex program to count the number of words, lines, and special characters in a given input.
+
+Solution:
+%{
+#include <stdio.h>
+#include <ctype.h>
+
+int word_count = 0;
+int line_count = 0;
+int special_char_count = 0;
+%}
+
+%%
+
+[a-zA-Z0-9]+       { word_count++; }
+\n                 { line_count++; }
+[ \t]              { /* Skip spaces and tabs */ }
+[^a-zA-Z0-9 \t\n]  { special_char_count++; }
+
+%%
+
+int main() {
+    printf("Enter text input :\n");
+    yylex();
+    printf("\n--- Statistics ---\n");
+    printf("Lines             : %d\n", line_count);
+    printf("Words             : %d\n", word_count);
+    printf("Special Characters: %d\n", special_char_count);
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}

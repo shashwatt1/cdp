@@ -1,0 +1,88 @@
+Question 14:
+Write a Lex and Yacc program to validate a function definition.
+
+Solution:
+Lex file:
+%{
+#include "y.tab.h"
+%}
+
+%%
+"int"           { return INT; }
+"float"         { return FLOAT; }
+"char"          { return CHAR; }
+"void"          { return VOID; }
+"return"        { return RETURN; }
+
+[a-zA-Z_][a-zA-Z0-9_]*    { return IDENTIFIER; }
+[0-9]+                   { return NUMBER; }
+
+"("             { return LPAREN; }
+")"             { return RPAREN; }
+"{"             { return LBRACE; }
+"}"             { return RBRACE; }
+","             { return COMMA; }
+";"             { return SEMICOLON; }
+"="             { return ASSIGN; }
+"+"             { return PLUS; }
+
+[ \t\n]+        ;   // Ignore whitespace
+.               { return INVALID; }
+%%
+int yywrap() {
+    return 1;
+}
+
+Yacc file:
+%{
+#include <stdio.h>
+#include <stdlib.h>
+
+void yyerror(const char *s);
+int yylex();
+%}
+
+%token INT FLOAT CHAR VOID RETURN IDENTIFIER NUMBER LPAREN RPAREN LBRACE RBRACE COMMA SEMICOLON ASSIGN PLUS INVALID
+
+%%
+
+function_def:
+      type IDENTIFIER LPAREN params RPAREN LBRACE body RBRACE
+    ;
+
+type:
+      INT
+    | FLOAT
+    | CHAR
+    | VOID
+    ;
+
+params:
+      /* empty */
+    | type IDENTIFIER
+    | type IDENTIFIER COMMA params
+    ;
+
+body:
+      RETURN expression SEMICOLON
+    ;
+
+expression:
+      IDENTIFIER
+    | NUMBER
+    | IDENTIFIER PLUS IDENTIFIER
+    | NUMBER PLUS NUMBER
+    ;
+
+%%
+
+void yyerror(const char *s) {
+    fprintf(stderr, "Syntax Error: %s\n", s);
+}
+
+int main() {
+    printf("Enter a function definition:\n");
+    yyparse();
+    printf("Function definition is valid.\n");
+    return 0;
+}

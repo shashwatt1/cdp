@@ -1,0 +1,28 @@
+Question 5:
+Write a Lex program to accept a string having at least one zero.
+
+Solution:
+%{
+#include <stdio.h>
+int has_zero = 0;
+%}
+
+%%
+0               { has_zero = 1; }
+.|\n            { /* Accept any character, ignore */ }
+%%
+
+int main() {
+    printf("Enter a string (Ctrl+D to end):\n");
+    yylex();
+
+    if (has_zero)
+        printf("Accepted: The string contains at least one zero.\n");
+    else
+        printf("Rejected: The string does not contain any zero.\n");
+
+    return 0;
+}
+
+int yywrap() {
+    return 1; }

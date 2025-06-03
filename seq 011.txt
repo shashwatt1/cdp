@@ -1,0 +1,44 @@
+Question 6:
+Write a Lex program to implement a DFA for a binary string containing the sequence '011'.
+
+Solution: 
+%{
+#include <stdio.h>
+%}
+
+%s A B C D
+
+%%
+
+<INITIAL>1              { BEGIN INITIAL; }
+<INITIAL>0              { BEGIN A; }
+<INITIAL>\n             { BEGIN INITIAL; printf("N/A\n"); }
+
+<A>1                    { BEGIN B; }
+<A>0                    { BEGIN A; }
+<A>\n                   { BEGIN INITIAL; printf("N/A\n"); }
+<A>[^10\n]              { BEGIN D; }
+
+<B>1                    { BEGIN C; }
+<B>0                    { BEGIN A; }
+<B>\n                   { BEGIN INITIAL; printf("N/A\n"); }
+<B>[^10\n]              { BEGIN D; }
+
+<C>[01]*                { BEGIN C; }
+<C>\n                   { BEGIN INITIAL; printf("Valid\n"); }
+<C>[^10\n]              { BEGIN D; }
+
+<D>[^\n]                { BEGIN D; }
+<D>\n                   { BEGIN INITIAL; printf("N/A\n"); }
+
+%%
+
+int yywrap() {
+    return 1;
+}
+
+int main() {
+    printf("Enter binary strings (each on a new line):\n");
+    yylex();
+    return 0;
+}

@@ -1,0 +1,63 @@
+Question 12:
+Write a Lex and Yacc program to validate an IF condition.
+
+Solution:
+Lex file:
+%{
+#include "y.tab.h"
+%}
+
+%%
+
+"if"                    { return IF; }
+"("                     { return LPAREN; }
+")"                     { return RPAREN; }
+
+[0-9]+                  { return NUMBER; }
+[a-zA-Z_][a-zA-Z0-9_]*  { return IDENTIFIER; }
+
+"=="|"!="|"<="|">="|"<"|">"  { return RELOP; }
+
+[ \t\n]+                { /* skip whitespace */ }
+.                       { return INVALID; }
+
+%%
+
+int yywrap() { return 1; }
+
+
+Yacc file:
+%{
+#include <stdio.h>
+#include <stdlib.h>
+
+int yylex();
+void yyerror(const char *s);
+%}
+
+%token IF LPAREN RPAREN NUMBER IDENTIFIER RELOP INVALID
+
+%%
+
+stmt:
+    IF LPAREN condition RPAREN    { printf("Valid IF condition.\n"); }
+    ;
+
+condition:
+    IDENTIFIER RELOP IDENTIFIER
+    | IDENTIFIER RELOP NUMBER
+    | NUMBER RELOP IDENTIFIER
+    | NUMBER RELOP NUMBER
+    ;
+
+%%
+
+void yyerror(const char *s) {
+    fprintf(stderr, "Error: %s\n", s);
+}
+
+int main() {
+    printf("Enter an IF condition (e.g., if(x == 10)):\n");
+    yyparse();
+    return 0;
+}
