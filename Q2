@@ -1,0 +1,105 @@
+lex
+%{
+#include "y.tab.h"
+%}
+
+%%
+"struct"        { return STRUCT; }
+"{"             { return LBRACE; }
+"}"             { return RBRACE; }
+";"             { return SEMICOLON; }
+"int"           { return INT; }
+"char"          { return CHAR; }
+"float"         { return FLOAT; }
+"double"        { return DOUBLE; }
+"["             { return LBRACKET; }
+"]"             { return RBRACKET; }
+
+[0-9]+          { yylval.num = atoi(yytext); return NUMBER; }
+[a-zA-Z_][a-zA-Z0-9_]* { yylval.id = strdup(yytext); return IDENTIFIER; }
+[ \t\n]+        ;  // Skip whitespace
+.               ;  // Ignore unrecognized characters
+%%
+
+
+
+yacc
+
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void yyerror(const char *s);
+int yylex(void);
+%}
+
+%union {
+    char *id;
+    int num;
+}
+
+%token <id> IDENTIFIER
+%token <num> NUMBER
+%token STRUCT INT CHAR FLOAT DOUBLE
+%token LBRACE RBRACE LBRACKET RBRACKET SEMICOLON
+
+%%
+
+program:
+    struct_def
+    ;
+
+struct_def:
+    STRUCT IDENTIFIER LBRACE member_list RBRACE SEMICOLON {
+        printf("Parsed struct: %s\n", $2);
+    }
+    ;
+
+member_list:
+    member_list member
+    | member
+    ;
+
+member:
+    type IDENTIFIER SEMICOLON {
+        printf("  Field: %s %s\n", $1, $2);
+    }
+    | type IDENTIFIER LBRACKET NUMBER RBRACKET SEMICOLON {
+        printf("  Field: %s %s[%d]\n", $1, $2, $4);
+    }
+    ;
+
+type:
+    INT     { $$ = "int"; }
+    | CHAR  { $$ = "char"; }
+    | FLOAT { $$ = "float"; }
+    | DOUBLE { $$ = "double"; }
+    ;
+
+%%
+
+void yyerror(const char *s) {
+    fprintf(stderr, "Error: %s\n", s);
+
+
+
+
+}
+
+
+
+sample eg
+struct Person {
+    int age;
+    char name[50];
+};
+
+
+
+
+
+lex lexer.l
+yacc -d parser.y
+gcc lex.yy.c y.tab.c -o parser
+./parser
