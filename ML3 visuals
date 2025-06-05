@@ -1,0 +1,17 @@
+import pandas as pd
+from sklearn.cluster import AgglomerativeClustering
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+df = pd.read_csv('your_file.csv')
+X = df.values
+X = StandardScaler().fit_transform(X)
+
+model = AgglomerativeClustering(n_clusters=3)
+labels = model.fit_predict(X)
+
+df['Cluster'] = labels
+sns.scatterplot(x=X[:, 0], y=X[:, 1], hue=labels, palette='Set2')
+plt.title('Agglomerative Clustering')
+plt.show()
