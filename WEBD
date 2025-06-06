@@ -1,0 +1,32 @@
+STOP WATCH
+
+<button onclick="start()">Start</button>
+<button onclick="stop()">Stop</button>
+<button onclick="reset()">Reset</button>
+<button onclick="lap()">Lap</button>
+<div id="t">00:00:00</div>
+<div id="l"></div>
+<script>
+let s=0,x
+function start(){if(!x)x=setInterval(()=>{s++;t.innerText=f(s)},1000)}
+function stop(){clearInterval(x);x=null}
+function reset(){stop();s=0;t.innerText="00:00:00";l.innerHTML=""}
+function lap(){let d=document.createElement("div");d.innerText=f(s);l.appendChild(d)}
+function f(s){let h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60
+return[h,m,ss].map(v=>v.toString().padStart(2,0)).join(":")}
+</script>
+
+
+
+PHP FORM COOKIE
+
+<?php
+if(isset($_POST["n"]))setcookie("n",$_POST["n"],time()+3600);
+$n=$_COOKIE["n"]??null;
+?>
+<form method=post <?= $n?"style='display:none'":""?>>
+<input name=n>
+<input type=submit>
+</form>
+<?php if($n)echo"Hello, $n"; ?>
+
